@@ -9,7 +9,7 @@ const lightboxClose = document.getElementById("lightboxClose");
 const hourRows = document.querySelectorAll(".hour-row");
 const todayStatus = document.getElementById("todayStatus");
 
-// Mobile menu
+// Mobile nav
 if (menuToggle && navMenu) {
   menuToggle.addEventListener("click", () => {
     const isOpen = navMenu.classList.toggle("open");
@@ -22,37 +22,62 @@ if (menuToggle && navMenu) {
       menuToggle.setAttribute("aria-expanded", "false");
     });
   });
+
+  document.addEventListener("click", (e) => {
+    const clickedInsideMenu = navMenu.contains(e.target);
+    const clickedToggle = menuToggle.contains(e.target);
+
+    if (!clickedInsideMenu && !clickedToggle) {
+      navMenu.classList.remove("open");
+      menuToggle.setAttribute("aria-expanded", "false");
+    }
+  });
 }
 
 // Back to top visibility
 window.addEventListener("scroll", () => {
-  if (window.scrollY > 500) {
-    backToTop.classList.add("show");
-  } else {
-    backToTop.classList.remove("show");
+  if (backToTop) {
+    if (window.scrollY > 500) {
+      backToTop.classList.add("show");
+    } else {
+      backToTop.classList.remove("show");
+    }
   }
 });
 
 // Scroll reveal
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
-      }
-    });
-  },
-  {
-    threshold: 0.12,
-  }
-);
+if ("IntersectionObserver" in window) {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.12,
+    }
+  );
 
-revealItems.forEach((item) => observer.observe(item));
+  revealItems.forEach((item) => observer.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add("visible"));
+}
 
 // Gallery lightbox
+function closeLightbox() {
+  if (!lightbox || !lightboxImage) return;
+  lightbox.classList.remove("open");
+  lightbox.setAttribute("aria-hidden", "true");
+  lightboxImage.src = "";
+  document.body.style.overflow = "";
+}
+
 galleryItems.forEach((item) => {
   item.addEventListener("click", () => {
+    if (!lightbox || !lightboxImage) return;
     const imgPath = item.getAttribute("data-image");
     lightboxImage.src = imgPath;
     lightbox.classList.add("open");
@@ -61,23 +86,20 @@ galleryItems.forEach((item) => {
   });
 });
 
-function closeLightbox() {
-  lightbox.classList.remove("open");
-  lightbox.setAttribute("aria-hidden", "true");
-  lightboxImage.src = "";
-  document.body.style.overflow = "";
+if (lightboxClose) {
+  lightboxClose.addEventListener("click", closeLightbox);
 }
 
-lightboxClose.addEventListener("click", closeLightbox);
-
-lightbox.addEventListener("click", (e) => {
-  if (e.target === lightbox) {
-    closeLightbox();
-  }
-});
+if (lightbox) {
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) {
+      closeLightbox();
+    }
+  });
+}
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && lightbox.classList.contains("open")) {
+  if (e.key === "Escape" && lightbox && lightbox.classList.contains("open")) {
     closeLightbox();
   }
 });
