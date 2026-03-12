@@ -36,12 +36,12 @@ if (menuToggle && navMenu) {
 
 // Back to top visibility
 window.addEventListener("scroll", () => {
-  if (backToTop) {
-    if (window.scrollY > 500) {
-      backToTop.classList.add("show");
-    } else {
-      backToTop.classList.remove("show");
-    }
+  if (!backToTop) return;
+
+  if (window.scrollY > 500) {
+    backToTop.classList.add("show");
+  } else {
+    backToTop.classList.remove("show");
   }
 });
 
@@ -69,6 +69,7 @@ if ("IntersectionObserver" in window) {
 // Gallery lightbox
 function closeLightbox() {
   if (!lightbox || !lightboxImage) return;
+
   lightbox.classList.remove("open");
   lightbox.setAttribute("aria-hidden", "true");
   lightboxImage.src = "";
@@ -78,6 +79,7 @@ function closeLightbox() {
 galleryItems.forEach((item) => {
   item.addEventListener("click", () => {
     if (!lightbox || !lightboxImage) return;
+
     const imgPath = item.getAttribute("data-image");
     lightboxImage.src = imgPath;
     lightbox.classList.add("open");
@@ -106,6 +108,7 @@ document.addEventListener("keydown", (e) => {
 
 // Highlight today's hours
 const today = new Date().getDay(); // Sunday=0, Monday=1, ...
+
 hourRows.forEach((row) => {
   if (Number(row.dataset.day) === today) {
     row.classList.add("active");
