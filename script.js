@@ -8,6 +8,7 @@ const lightboxImage = document.getElementById("lightboxImage");
 const lightboxClose = document.getElementById("lightboxClose");
 const hourRows = document.querySelectorAll(".hour-row");
 const todayStatus = document.getElementById("todayStatus");
+const faqButtons = document.querySelectorAll(".faq-question");
 
 // Mobile nav
 if (menuToggle && navMenu) {
@@ -107,7 +108,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 // Highlight today's hours
-const today = new Date().getDay(); // Sunday=0, Monday=1, ...
+const today = new Date().getDay();
 
 hourRows.forEach((row) => {
   if (Number(row.dataset.day) === today) {
@@ -118,3 +119,25 @@ hourRows.forEach((row) => {
 if (todayStatus) {
   todayStatus.textContent = "Open Today • 9:30 AM – 8:00 PM";
 }
+
+// FAQ accordion
+faqButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const item = button.closest(".faq-item");
+    if (!item) return;
+
+    const isOpen = item.classList.contains("open");
+
+    faqButtons.forEach((btn) => {
+      const parent = btn.closest(".faq-item");
+      if (!parent) return;
+      parent.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+    });
+
+    if (!isOpen) {
+      item.classList.add("open");
+      button.setAttribute("aria-expanded", "true");
+    }
+  });
+});
