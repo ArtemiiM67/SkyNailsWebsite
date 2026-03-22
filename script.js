@@ -9,6 +9,9 @@ const lightboxClose = document.getElementById("lightboxClose");
 const hourRows = document.querySelectorAll(".hour-row");
 const todayStatus = document.getElementById("todayStatus");
 const faqButtons = document.querySelectorAll(".faq-question");
+const promoModal = document.getElementById("promoModal");
+const promoModalClose = document.getElementById("promoModalClose");
+const promoDismissElements = document.querySelectorAll("[data-close-promo]");
 
 // Mobile nav
 if (menuToggle && navMenu) {
@@ -101,12 +104,6 @@ if (lightbox) {
   });
 }
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && lightbox && lightbox.classList.contains("open")) {
-    closeLightbox();
-  }
-});
-
 // Highlight today's hours
 const today = new Date().getDay();
 
@@ -140,4 +137,58 @@ faqButtons.forEach((button) => {
       button.setAttribute("aria-expanded", "true");
     }
   });
+});
+
+// Promo modal
+function closePromoModal() {
+  if (!promoModal) return;
+
+  promoModal.classList.remove("show");
+  promoModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+  try {
+    localStorage.setItem("skyNailsPromoDismissed", "true");
+  } catch (error) {
+    console.warn("Promo modal dismissal could not be stored.", error);
+  }
+}
+
+function openPromoModal() {
+  if (!promoModal) return;
+
+  promoModal.classList.add("show");
+  promoModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+if (promoModal) {
+  let promoDismissed = false;
+
+  try {
+    promoDismissed = localStorage.getItem("skyNailsPromoDismissed") === "true";
+  } catch (error) {
+    promoDismissed = false;
+  }
+
+  if (!promoDismissed) {
+    window.setTimeout(openPromoModal, 800);
+  }
+}
+
+if (promoModalClose) {
+  promoModalClose.addEventListener("click", closePromoModal);
+}
+
+promoDismissElements.forEach((element) => {
+  element.addEventListener("click", closePromoModal);
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && lightbox && lightbox.classList.contains("open")) {
+    closeLightbox();
+  }
+
+  if (e.key === "Escape" && promoModal && promoModal.classList.contains("show")) {
+    closePromoModal();
+  }
 });
